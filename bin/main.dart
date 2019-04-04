@@ -16,6 +16,7 @@ Future initiate() async {
   //  Response response = await client.get('https://nastachku.ru/schedule?selected_section=27-04-2019');
   //  final body = response.body;
 
+  List<RoomDescription> rooms = [];
   final String body =
       File('/Users/andrey.smirnov/Desktop/Flutter Presentation/examples/stachka/nastachku-parser/bin/source.html')
           .readAsStringSync();
@@ -26,10 +27,16 @@ Future initiate() async {
     final roomLiter = clearText(roomHeader.nodes[1].text);
     final roomName = clearText(roomHeader.nodes[2].text);
     print('$roomLiter, $roomName');
+
+    rooms.add(RoomDescription(roomLiter, roomName));
   }
 
   List<Element> programColumns = document.querySelectorAll('div.program__body > div.program__column');
-  for (Element programColumn in programColumns) {
+  for (int index = 0; index < programColumns.length; index++) {
+    final room = rooms[index];
+    Element programColumn = programColumns[index];
+
+    print('----------------------------------------- lectures in $room ---------------------------------------------');
     //  events
     List<Element> eventNodes = programColumn.querySelectorAll('div.program__event');
     for (Element eventNode in eventNodes) {
@@ -38,7 +45,7 @@ Future initiate() async {
 
       if (eventTime != null && eventName != null) {
         print('event name: $eventName on time: $eventTime');
-      } else if (eventTime == null || eventName != null) {
+      } else if (eventTime == null && eventName != null) {
         print('event name: $eventName');
       }
     }
@@ -74,4 +81,14 @@ Future initiate() async {
       print('\n');
     }
   }
+}
+
+class RoomDescription {
+  final String liter;
+  final String name;
+
+  RoomDescription(this.liter, this.name);
+
+  @override
+  String toString() => 'RoomDescription{liter: $liter, name: $name}';
 }
